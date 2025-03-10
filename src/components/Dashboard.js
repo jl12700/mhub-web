@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import '../styles/Dashboard.css';
+import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
   const [activeItem, setActiveItem] = useState('Dashboard');
   const [searchQuery, setSearchQuery] = useState('');
+  const navigate = useNavigate();
 
   const equipmentList = [
     { id: 1, name: 'TV', stock: 5, image: '/tv.jpg' },
@@ -26,17 +28,12 @@ const Dashboard = () => {
         <img src="/dlsl-logo.png" alt="DLSL Logo" className="logo" />
         <div className="sidebar-title">MHUB Reservation</div>
         <ul>
-          {['Dashboard', 'Borrow Item', 'User Profile', 'Logout'].map((item) => (
-            <li
-              key={item}
-              className={activeItem === item ? 'active' : ''}
-              onClick={() => setActiveItem(item)}
-            >
-              {item}
-              {activeItem === item && <span className="arrow">▶</span>}
-            </li>
-          ))}
-        </ul>
+  <li className={activeItem === 'Dashboard' ? 'active' : ''} onClick={() => navigate('/dashboard')}>Dashboard</li>
+  <li className={activeItem === 'Borrow Item' ? 'active' : ''} onClick={() => navigate('/borrow')}>Borrow Item</li>
+  <li className={activeItem === 'User Profile' ? 'active' : ''} onClick={() => navigate('/profile')}>User Profile</li>
+  <li className={activeItem === 'Logout' ? 'active' : ''} onClick={() => navigate('/logout')}>Logout</li>
+</ul>
+
       </div>
 
       <div className="main-content">
