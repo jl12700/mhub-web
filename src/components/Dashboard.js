@@ -1,27 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Logout from './Logout'; // Import Logout component
 import '../styles/Dashboard.css';
+import '../styles/Logout.css'; 
 
 const Dashboard = () => {
   const [activeItem, setActiveItem] = useState('Dashboard');
-  const [searchQuery, setSearchQuery] = useState('');
+  const navigate = useNavigate();
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [reservationHistory, setReservationHistory] = useState([]);
+  const [userReservations, setUserReservations] = useState([]);
+  const [outOfStockEquipment, setOutOfStockEquipment] = useState([]);
+  const [pendingApprovals, setPendingApprovals] = useState([]);
 
-  const equipmentList = [
-    { id: 1, name: 'TV', stock: 5, image: '/tv.jpg' },
-    { id: 2, name: 'Laptop', stock: 10, image: '/laptop.jpg' },
-    { id: 3, name: 'Extension Cord', stock: 8, image: '/extension.jpg' },
-    { id: 4, name: 'Speakers', stock: 3, image: '/speaker.jpg' },
-    { id: 5, name: 'Microphone', stock: 7, image: '/mic.jpg' },
-    { id: 6, name: 'Projector', stock: 2, image: '/projector.jpg' },
-  ];
+  useEffect(() => {
+    const storedApprovals = JSON.parse(localStorage.getItem('pendingApprovals')) || [];
+    setPendingApprovals(storedApprovals);
+  }, []);
 
-
-  const filteredEquipment = equipmentList.filter((equipment) =>
-    equipment.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const handleNavigation = (item) => {
+    setActiveItem(item);
+    if (item === 'Borrow Item') navigate('/borrow');
+    if (item === 'Logout') setShowLogoutModal(true); // Show logout modal
+  };
 
   return (
     <div className="dashboard-container">
-      
       <div className="sidebar">
         <img src="/dlsl-logo.png" alt="DLSL Logo" className="logo" />
         <div className="sidebar-title">MHUB Reservation</div>
@@ -30,7 +34,7 @@ const Dashboard = () => {
             <li
               key={item}
               className={activeItem === item ? 'active' : ''}
-              onClick={() => setActiveItem(item)}
+              onClick={() => handleNavigation(item)}
             >
               {item}
               {activeItem === item && <span className="arrow">▶</span>}
@@ -40,34 +44,67 @@ const Dashboard = () => {
       </div>
 
       <div className="main-content">
-       
-        <div className="header">
-          <h1>Welcome to MHUB Dashboard</h1>
-          <p>All equipment is ready for reservation.</p>
-          <input
-            type="text"
-            className="search-bar"
-            placeholder="Search equipment..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
+        <div className="tiles-container">
+          <div className="tile">
+            <div className="tile-header">Reservation History</div>
+            <div className="tile-content">
+              {reservationHistory.length > 0 ? (
+                <ul>
+                  {reservationHistory.map((res) => (
+                    <li key={res.id}>{res.item} - {res.date}</li>
+                  ))}
+                </ul>
+              ) : (
+                'No recent reservations.'
+              )}
+            </div>
+          </div>
 
-        
-        <div className="equipment-grid">
-          {filteredEquipment.length > 0 ? (
-            filteredEquipment.map((equipment) => (
-              <div key={equipment.id} className="equipment-card">
-                <img src={equipment.image} alt={equipment.name} className="equipment-image" />
-                <h3>{equipment.name}</h3>
-                <p>Stock: {equipment.stock}</p>
-              </div>
-            ))
-          ) : (
-            <p className="no-results">No equipment found.</p>
-          )}
+          <div className="tile">
+            <div className="tile-header">User Reservations</div>
+            <div className="tile-content">
+              {userReservations.length > 0 ? (
+                <ul>
+                  {userReservations.map((res) => (
+                    <li key={res.id}>{res.item} - {res.date}</li>
+                  ))}
+                </ul>
+              ) : (
+                'No active reservations.'
+              )}
+            </div>
+          </div>
+
+          <div className="tile">
+            <div className="tile-header">Out of Stock Equipment</div>
+            <div className="tile-content">
+              {outOfStockEquipment.length > 0 ? (
+                outOfStockEquipment.join(', ')
+              ) : (
+                'All equipment is available.'
+              )}
+            </div>
+          </div>
+
+          <div className="tile">
+            <div className="tile-header">Pending Approvals</div>
+            <div className="tile-content">
+              {pendingApprovals.length > 0 ? (
+                <ul>
+                  {pendingApprovals.map((res, index) => (
+                    <li key={index}>{res.item} - Pickup: {res.pickupDate}</li>
+                  ))}
+                </ul>
+              ) : (
+                'No pending approvals.'
+              )}
+            </div>
+          </div>
         </div>
       </div>
+
+      {/* Logout Modal */}
+      {showLogoutModal && <Logout setShowModal={setShowLogoutModal} />}
     </div>
   );
 };

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Login.css';
 
+
 const Login = () => {
   const [email, setEmail] = useState('');
   const [idNumber, setIdNumber] = useState('');
@@ -25,18 +26,23 @@ const Login = () => {
 
     if (userType === 'admin') {
       if (email === adminCredentials.username && password === adminCredentials.password) {
+        localStorage.setItem('user', JSON.stringify({ email, idNumber, userType }));
         navigate('/dashboard'); 
       } else {
         alert('Invalid admin credentials');
       }
     } else if (userType === 'student') {
       if (email.endsWith('@dlsl.edu.ph') && password === studentPassword) {
+       
+        localStorage.setItem('user', JSON.stringify({ email, idNumber, userType }));
         navigate('/set-password'); 
       } else {
         alert('Invalid student credentials. Make sure you are using your school email and correct password.');
       }
     } else if (userType === 'faculty') {
       if (email.endsWith('@dlsl.edu.ph') && password === facultyPassword) {
+   
+        localStorage.setItem('user', JSON.stringify({ email, idNumber, userType }));
         navigate('/set-password'); 
       } else {
         alert('Invalid faculty credentials. Make sure you are using your school email and correct password.');
@@ -47,7 +53,7 @@ const Login = () => {
   return (
     <div className="login-container">
       <img src="/dlsl-logo.png" alt="DLSL Logo" className="logo" />
-      <h2>MHUB Reservation System</h2>
+      <h2>MHUB Reservation</h2>
       <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label>Email/Username:</label>

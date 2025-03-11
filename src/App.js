@@ -4,15 +4,24 @@ import Login from './components/Login';
 import SetPassword from './components/SetPassword';
 import TermsAndConditions from './components/TermsAndConditions';
 import Dashboard from './components/Dashboard';
+import BorrowItem from './components/BorrowItem';
+import BorrowDetails from './components/BorrowDetails';
+import UserProfile from './components/UserProfile'; // Import UserProfile component
+import Logout from './components/Logout'; // Import Logout component
 
 const App = () => {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<Login />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/set-password" element={<SetPassword />} />
         <Route path="/terms" element={<TermsAndConditions />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/borrow" element={<BorrowItem />} />
+        <Route path="/borrow-details" element={<BorrowDetails />} />
+        <Route path="/profile" element={<UserProfile />} /> {/* User Profile route */}
+        <Route path="/logout" element={<Logout />} /> {/* Logout route */}
       </Routes>
     </Router>
   );
