@@ -111,12 +111,13 @@ body {
 
 .search-bar {
   width: 100%;
-  max-width: 400px;
-  padding: 10px;
+  max-width: 250px;
+  padding: 5px;
   font-size: 16px;
   border: 1px solid #ccc;
   border-radius: 5px;
   margin-bottom: 20px;
+  height: 19px;
 }
 
 .equipment-grid-container {
