@@ -15,7 +15,7 @@ const Dashboard = () => {
   const [pendingApprovals, setPendingApprovals] = useState([]);
 
   useEffect(() => {
-    const storedApprovals = JSON.parse(localStorage.getItem('pendingApprovals')) || [];
+    const storedApprovals = JSON.parse(localStorage.getItem('pendingReservations')) || [];
     setPendingApprovals(storedApprovals);
   }, []);
 
