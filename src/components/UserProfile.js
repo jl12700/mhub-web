@@ -1,27 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../styles/UserProfile.css'; // Import the updated CSS file
+import Logout from './Logout'; // Import Logout component
+import '../styles/UserProfile.css'; 
 
 const UserProfile = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [idNumber, setIdNumber] = useState('');
   const [userType, setUserType] = useState('student');
-  const [phoneNumber, setPhoneNumber] = useState(''); // State for phone number
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [isEditing, setIsEditing] = useState(false);
+  const [showModal, setShowModal] = useState(false); // State for modal
 
-  // Load user details from localStorage or state
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user')) || {};
     setEmail(user.email || '');
     setIdNumber(user.idNumber || '');
     setUserType(user.userType || 'student');
-    setPhoneNumber(user.phoneNumber || ''); // Load phone number
+    setPhoneNumber(user.phoneNumber || '');
   }, []);
 
   const handleSave = () => {
-    // Save updated user details to localStorage
-    const updatedUser = { email, idNumber, userType, phoneNumber }; // Include phone number
+    const updatedUser = { email, idNumber, userType, phoneNumber };
     localStorage.setItem('user', JSON.stringify(updatedUser));
     setIsEditing(false);
     alert('Profile updated successfully!');
@@ -36,7 +36,7 @@ const UserProfile = () => {
           <li onClick={() => navigate('/dashboard')}>Dashboard</li>
           <li onClick={() => navigate('/borrow')}>Borrow Item</li>
           <li className="active">User Profile</li>
-          <li onClick={() => navigate('/logout')}>Logout</li>
+          <li onClick={() => setShowModal(true)}>Logout</li> {/* Open modal */}
         </ul>
       </div>
 
@@ -44,20 +44,17 @@ const UserProfile = () => {
         <h1>User Profile</h1>
         <div className="profile-details">
           <div className="profile-fields-grid">
-            {/* Email and User Type */}
             <div className="profile-field">
               <label>Email:</label>
-              <span>{email}</span> {/* Read-only email */}
+              <span>{email}</span>
             </div>
             <div className="profile-field">
               <label>User Type:</label>
-              <span>{userType}</span> {/* Read-only user type */}
+              <span>{userType}</span>
             </div>
-
-            {/* ID Number and Phone Number */}
             <div className="profile-field">
               <label>ID Number:</label>
-              <span>{idNumber}</span> {/* Read-only ID number */}
+              <span>{idNumber}</span>
             </div>
             <div className="profile-field">
               <label>Phone Number:</label>
@@ -74,25 +71,21 @@ const UserProfile = () => {
             </div>
           </div>
 
-          {/* Profile Actions */}
           <div className="profile-actions">
             {isEditing ? (
               <>
-                <button className="save-button" onClick={handleSave}>
-                  Save
-                </button>
-                <button className="cancel-button" onClick={() => setIsEditing(false)}>
-                  Cancel
-                </button>
+                <button className="save-button" onClick={handleSave}>Save</button>
+                <button className="cancel-button" onClick={() => setIsEditing(false)}>Cancel</button>
               </>
             ) : (
-              <button className="edit-button" onClick={() => setIsEditing(true)}>
-                Edit
-              </button>
+              <button className="edit-button" onClick={() => setIsEditing(true)}>Edit</button>
             )}
           </div>
         </div>
       </div>
+
+      {/* Logout Modal */}
+      {showModal && <Logout setShowModal={setShowModal} />}
     </div>
   );
 };

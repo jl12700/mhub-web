@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Logout from './Logout'; // Import Logout component
+import Logout from './Logout'; 
+import UserProfile from './UserProfile';
 import '../styles/Dashboard.css';
 import '../styles/Logout.css'; 
 
@@ -21,6 +22,7 @@ const Dashboard = () => {
   const handleNavigation = (item) => {
     setActiveItem(item);
     if (item === 'Borrow Item') navigate('/borrow');
+    if (item === 'User Profile') navigate('/profile');
     if (item === 'Logout') setShowLogoutModal(true); // Show logout modal
   };
 
