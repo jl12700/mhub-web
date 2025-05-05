@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import '../styles/BorrowDetails.css';
-import Logout from './Logout'; // Import Logout component
+import Logout from './Logout';
+import axios from 'axios';
 
 const BorrowDetails = () => {
   const location = useLocation();
@@ -15,7 +16,9 @@ const BorrowDetails = () => {
   const [usageLocation, setUsageLocation] = useState('');
   const [minDate, setMinDate] = useState('');
   const [modalError, setModalError] = useState('');
-  const [showLogoutModal, setShowLogoutModal] = useState(false); // State for logout modal
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+
+  const user = JSON.parse(localStorage.getItem('user')); // Get user from localStorage
 
   useEffect(() => {
     if (!selectedItems || selectedItems.length === 0) {
@@ -55,6 +58,14 @@ const BorrowDetails = () => {
       errorMessage = 'Return time must be later than pickup time.';
     }
 
+    if (!activity.trim()) {
+      errorMessage = 'Activity purpose is required.';
+    }
+
+    if (!usageLocation.trim()) {
+      errorMessage = 'Usage location is required.';
+    }
+
     if (errorMessage) {
       setModalError(errorMessage);
       return false;
@@ -62,23 +73,35 @@ const BorrowDetails = () => {
     return true;
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (validateForm()) {
+      if (!user) {
+        alert('User not logged in.');
+        return;
+      }
+
       const newReservation = {
+        userEmail: user.email,
+        userIdNumber: user.idNumber,
+        userType: user.userType,
         items: selectedItems,
         pickupDate,
         pickupTime,
+        returnTime,
         activity,
         usageLocation,
+        status: 'Pending', // optional: set reservation status
+        createdAt: new Date(), // timestamp
       };
 
-      const storedReservations = JSON.parse(localStorage.getItem('pendingReservations')) || [];
-      const updatedReservations = [...storedReservations, newReservation];
-
-      localStorage.setItem('pendingReservations', JSON.stringify(updatedReservations));
-
-      alert('Reservation confirmed!');
-      navigate('/dashboard');
+      try {
+        await axios.post('http://localhost:5000/api/reservations', newReservation);
+        alert('Reservation submitted successfully!');
+        navigate('/dashboard');
+      } catch (error) {
+        console.error('Submission error:', error);
+        alert('An error occurred while submitting your reservation.');
+      }
     }
   };
 
@@ -91,7 +114,7 @@ const BorrowDetails = () => {
           <li onClick={() => navigate('/dashboard')}>Dashboard</li>
           <li className="active">Borrow Item</li>
           <li onClick={() => navigate('/profile')}>User Profile</li>
-          <li onClick={() => setShowLogoutModal(true)}>Logout</li> {/* Show logout modal */}
+          <li onClick={() => setShowLogoutModal(true)}>Logout</li>
         </ul>
       </div>
 
@@ -149,7 +172,6 @@ const BorrowDetails = () => {
         <button className="confirm-button" onClick={handleConfirm}>Confirm</button>
       </div>
 
-      {/* Logout Modal */}
       {showLogoutModal && <Logout setShowModal={setShowLogoutModal} />}
     </div>
   );

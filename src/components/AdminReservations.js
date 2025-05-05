@@ -1,40 +1,67 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/AdminReservations.css';
-import { FaTrash } from 'react-icons/fa'; // For the remove icon
-import Logout from './Logout'; // Import Logout component
+import { FaTrash } from 'react-icons/fa';
+import Logout from './Logout';
 
 const AdminReservations = () => {
   const [reservations, setReservations] = useState([]);
   const [selectedReservation, setSelectedReservation] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [showLogoutModal, setShowLogoutModal] = useState(false); // State for logout modal
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Fetch reservations from localStorage
-    const storedReservations = JSON.parse(localStorage.getItem('pendingReservations')) || [];
-    // Ensure `equipment` is always an array
-    const formattedReservations = storedReservations.map((res) => ({
-      ...res,
-      equipment: res.equipment || [], // Default to empty array if undefined
-    }));
-    setReservations(formattedReservations);
+    const fetchReservations = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/reservations');
+        const data = await response.json();
+        const formattedReservations = data.map((res) => ({
+          ...res,
+          equipment: res.equipment || [],
+          status: res.status || 'Pending',
+        }));
+        setReservations(formattedReservations);
+      } catch (error) {
+        console.error('Error fetching reservations:', error);
+      }
+    };
+
+    fetchReservations();
   }, []);
 
-  const handleStatusChange = (id, newStatus) => {
-    const updatedReservations = reservations.map((res) =>
-      res.id === id ? { ...res, status: newStatus } : res
-    );
-    setReservations(updatedReservations);
-    localStorage.setItem('pendingReservations', JSON.stringify(updatedReservations));
-    setShowModal(false);
+  // Change dropdown only - update selectedReservation locally
+  const handleStatusChange = (newStatus) => {
+    setSelectedReservation((prev) => ({ ...prev, status: newStatus }));
+  };
+
+  // Save status to server
+  const handleSaveStatus = async () => {
+    try {
+      await fetch(`http://localhost:5000/api/reservations/${selectedReservation._id || selectedReservation.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: selectedReservation.status }),
+      });
+
+      // Update local reservations list after saving
+      setReservations((prevReservations) =>
+        prevReservations.map((res) =>
+          (res._id || res.id) === (selectedReservation._id || selectedReservation.id)
+            ? { ...res, status: selectedReservation.status }
+            : res
+        )
+      );
+
+      setShowModal(false);
+    } catch (error) {
+      console.error('Error saving status:', error);
+    }
   };
 
   const handleRemoveReservation = (id) => {
-    const updatedReservations = reservations.filter((res) => res.id !== id);
+    const updatedReservations = reservations.filter((res) => (res._id || res.id) !== id);
     setReservations(updatedReservations);
-    localStorage.setItem('pendingReservations', JSON.stringify(updatedReservations));
   };
 
   const getStatusColor = (status) => {
@@ -63,9 +90,10 @@ const AdminReservations = () => {
               key={item}
               className={item === 'Reservations' ? 'active' : ''}
               onClick={() => {
+                if (item === 'Reservations') navigate('/admin/reservations');
                 if (item === 'Inventory') navigate('/admin/inventory');
                 if (item === 'Statistics') navigate('/admin/statistics');
-                if (item === 'Logout') setShowLogoutModal(true); // Show logout modal
+                if (item === 'Logout') setShowLogoutModal(true);
               }}
             >
               {item}
@@ -92,17 +120,24 @@ const AdminReservations = () => {
           </thead>
           <tbody>
             {reservations.map((res) => (
-              <tr key={res.id}>
-                <td>{res.id}</td>
+              <tr key={res._id || res.id}>
+                <td>{res.id || res._id}</td>
                 <td>{res.name}</td>
                 <td>{res.mobile}</td>
-                <td>{res.equipment.join(', ')}</td>
+                <td>{(res.equipment || []).join(', ')}</td>
                 <td>{res.venue}</td>
                 <td>{res.activity}</td>
                 <td>
                   <div
                     className="status-bar"
-                    style={{ backgroundColor: getStatusColor(res.status) }}
+                    style={{
+                      backgroundColor: getStatusColor(res.status),
+                      padding: '5px 10px',
+                      borderRadius: '12px',
+                      color: 'white',
+                      fontWeight: 'bold',
+                      textAlign: 'center',
+                    }}
                   >
                     {res.status}
                   </div>
@@ -113,7 +148,7 @@ const AdminReservations = () => {
                   </button>
                   <FaTrash
                     className="remove-icon"
-                    onClick={() => handleRemoveReservation(res.id)}
+                    onClick={() => handleRemoveReservation(res._id || res.id)}
                   />
                 </td>
               </tr>
@@ -121,13 +156,14 @@ const AdminReservations = () => {
           </tbody>
         </table>
 
+        {/* Edit Status Modal */}
         {showModal && (
-          <div className="modal-overlay">
-            <div className="modal">
+          <div className="modal-overlay" onClick={() => setShowModal(false)}>
+            <div className="modal" onClick={(e) => e.stopPropagation()}>
               <h2>Change Status</h2>
               <select
                 value={selectedReservation.status}
-                onChange={(e) => handleStatusChange(selectedReservation.id, e.target.value)}
+                onChange={(e) => handleStatusChange(e.target.value)}
               >
                 <option value="Pending">Pending</option>
                 <option value="Accepted">Accepted</option>
@@ -135,7 +171,14 @@ const AdminReservations = () => {
                 <option value="Declined">Declined</option>
                 <option value="Damaged">Damaged</option>
               </select>
-              <button onClick={() => setShowModal(false)}>Close</button>
+              <div style={{ marginTop: '15px' }}>
+                <button onClick={handleSaveStatus} style={{ marginRight: '10px' }}>
+                  Save
+                </button>
+                <button onClick={() => setShowModal(false)}>
+                  Close
+                </button>
+              </div>
             </div>
           </div>
         )}

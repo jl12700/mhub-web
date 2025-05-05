@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Logout from './Logout';
+import axios from 'axios';
 import '../styles/Dashboard.css';
 
 const Dashboard = () => {
@@ -14,13 +15,41 @@ const Dashboard = () => {
   const [pendingApprovals, setPendingApprovals] = useState([]);
 
   useEffect(() => {
-    const storedApprovals = JSON.parse(localStorage.getItem('pendingReservations')) || [];
-    setPendingApprovals(storedApprovals);
-    
-    const user = JSON.parse(localStorage.getItem('user'));
-    if (user) {
-      setUserType(user.userType);
-    }
+    const fetchUserAndReservations = async () => {
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (user) {
+        setUserType(user.userType);
+
+        try {
+          // Fetch all reservations
+          const res = await axios.get('http://localhost:5000/api/reservations');
+
+          if (user.userType === 'admin') {
+            // Admin sees pending approvals
+            const pending = res.data.filter(r => r.status === 'pending');
+            setPendingApprovals(pending);
+          } else {
+            // Regular user sees their own reservations
+            const userRes = res.data.filter(r => r.userId === user.id);
+            setReservationHistory(userRes);
+            setUserReservations(userRes.filter(r => r.status === 'approved'));
+          }
+        } catch (error) {
+          console.error('Failed to fetch reservations:', error);
+        }
+
+        // Fetch out-of-stock equipment
+        try {
+          const equipRes = await axios.get('http://localhost:5000/api/equipment');
+          const outOfStock = equipRes.data.filter(eq => eq.quantity === 0).map(eq => eq.name);
+          setOutOfStockEquipment(outOfStock);
+        } catch (error) {
+          console.error('Failed to fetch equipment:', error);
+        }
+      }
+    };
+
+    fetchUserAndReservations();
   }, []);
 
   const handleNavigation = (item) => {
@@ -69,7 +98,12 @@ const Dashboard = () => {
                 {reservationHistory.length > 0 ? (
                   <ul>
                     {reservationHistory.map((res) => (
-                      <li key={res.id}>{res.item} - {res.date}</li>
+                      <li key={res._id}>
+                        {res.items.map((item, idx) => (
+                          <div key={idx}>{item.name} (Qty: {item.quantity})</div>
+                        ))}
+                        Pickup: {res.pickupDate}
+                      </li>
                     ))}
                   </ul>
                 ) : (
@@ -83,7 +117,12 @@ const Dashboard = () => {
                 {userReservations.length > 0 ? (
                   <ul>
                     {userReservations.map((res) => (
-                      <li key={res.id}>{res.item} - {res.date}</li>
+                      <li key={res._id}>
+                        {res.items.map((item, idx) => (
+                          <div key={idx}>{item.name} (Qty: {item.quantity})</div>
+                        ))}
+                        Pickup: {res.pickupDate}
+                      </li>
                     ))}
                   </ul>
                 ) : (
@@ -106,8 +145,13 @@ const Dashboard = () => {
               <div className="tile-content">
                 {pendingApprovals.length > 0 ? (
                   <ul>
-                    {pendingApprovals.map((res, index) => (
-                      <li key={index}>{res.item} - Pickup: {res.pickupDate}</li>
+                    {pendingApprovals.map((res) => (
+                      <li key={res._id}>
+                        {res.items.map((item, idx) => (
+                          <div key={idx}>{item.name} (Qty: {item.quantity})</div>
+                        ))}
+                        Pickup: {res.pickupDate}
+                      </li>
                     ))}
                   </ul>
                 ) : (
