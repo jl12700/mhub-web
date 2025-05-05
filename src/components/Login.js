@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Login.css';
 
-
 const Login = () => {
   const [email, setEmail] = useState('');
   const [idNumber, setIdNumber] = useState('');
@@ -12,7 +11,7 @@ const Login = () => {
 
   const handleIdNumberChange = (e) => {
     const value = e.target.value;
-    if (/^\d*$/.test(value)) { 
+    if (/^\d*$/.test(value)) {
       setIdNumber(value);
     }
   };
@@ -27,23 +26,21 @@ const Login = () => {
     if (userType === 'admin') {
       if (email === adminCredentials.username && password === adminCredentials.password) {
         localStorage.setItem('user', JSON.stringify({ email, idNumber, userType }));
-        navigate('/dashboard'); 
+        navigate('/admin/reservations'); // Redirect to admin reservations screen
       } else {
         alert('Invalid admin credentials');
       }
     } else if (userType === 'student') {
       if (email.endsWith('@dlsl.edu.ph') && password === studentPassword) {
-       
         localStorage.setItem('user', JSON.stringify({ email, idNumber, userType }));
-        navigate('/set-password'); 
+        navigate('/set-password'); // Redirect to set password screen
       } else {
         alert('Invalid student credentials. Make sure you are using your school email and correct password.');
       }
     } else if (userType === 'faculty') {
       if (email.endsWith('@dlsl.edu.ph') && password === facultyPassword) {
-   
         localStorage.setItem('user', JSON.stringify({ email, idNumber, userType }));
-        navigate('/set-password'); 
+        navigate('/set-password'); // Redirect to set password screen
       } else {
         alert('Invalid faculty credentials. Make sure you are using your school email and correct password.');
       }
@@ -55,8 +52,20 @@ const Login = () => {
       <img src="/dlsl-logo.png" alt="DLSL Logo" className="logo" />
       <h2>MHUB Reservation</h2>
       <form onSubmit={handleSubmit}>
+        <div className="form-group drop">
+          <label>Role:</label>
+          <select
+            value={userType}
+            onChange={(e) => setUserType(e.target.value)}
+            required
+          >
+            <option value="student">Student</option>
+            <option value="faculty">Faculty</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
         <div className="form-group">
-          <label>Email/Username:</label>
+          <label>Email:</label>
           <input
             type="text"
             value={email}
@@ -65,11 +74,11 @@ const Login = () => {
           />
         </div>
         <div className="form-group">
-          <label>Student/Faculty ID Number:</label>
+          <label>ID Number:</label>
           <input
             type="text"
             value={idNumber}
-            onChange={handleIdNumberChange} 
+            onChange={handleIdNumberChange}
             required
           />
         </div>
@@ -81,18 +90,6 @@ const Login = () => {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-        </div>
-        <div className="form-group">
-          <label>User Type:</label>
-          <select
-            value={userType}
-            onChange={(e) => setUserType(e.target.value)}
-            required
-          >
-            <option value="student">Student</option>
-            <option value="faculty">Faculty</option>
-            <option value="admin">Admin</option>
-          </select>
         </div>
         <button type="submit">Login</button>
       </form>

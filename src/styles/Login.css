@@ -42,6 +42,17 @@ body {
     margin-bottom: 12px;
     text-align: left;
     margin-right: 15px;
+    
+}
+
+.form-group.drop {
+    margin-bottom: 12px;
+    text-align: left;
+    margin-left: 0;  
+}
+.form-group.drop select {
+    height: 30px;
+   
 }
 
 label {
@@ -52,11 +63,12 @@ label {
 }
 
 input, select {
-    width: 100%;
-    padding: 6px; 
+    width: 105%;
+    padding: 5px; 
     font-size: 14px;
     border: 1px solid #ccc;
-    border-radius: 5px;
+    border-radius: 5px; 
+    
 }
 
 button {

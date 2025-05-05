@@ -6,8 +6,11 @@ import TermsAndConditions from './components/TermsAndConditions';
 import Dashboard from './components/Dashboard';
 import BorrowItem from './components/BorrowItem';
 import BorrowDetails from './components/BorrowDetails';
-import UserProfile from './components/UserProfile'; // Import UserProfile component
-import Logout from './components/Logout'; // Import Logout component
+import UserProfile from './components/UserProfile';
+import Logout from './components/Logout';
+import AdminReservations from './components/AdminReservations'; // Import AdminReservations
+import AdminInventory from './components/AdminInventory'; // Import AdminInventory
+import AdminStatistics from './components/AdminStatistics'; // Import AdminStatistics
 
 const App = () => {
   return (
@@ -20,8 +23,12 @@ const App = () => {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/borrow" element={<BorrowItem />} />
         <Route path="/borrow-details" element={<BorrowDetails />} />
-        <Route path="/profile" element={<UserProfile />} /> {/* User Profile route */}
-        <Route path="/logout" element={<Logout />} /> {/* Logout route */}
+        <Route path="/profile" element={<UserProfile />} />
+        <Route path="/logout" element={<Logout />} />
+        {/* Admin Routes */}
+        <Route path="/admin/reservations" element={<AdminReservations />} />
+        <Route path="/admin/inventory" element={<AdminInventory />} />
+        <Route path="/admin/statistics" element={<AdminStatistics />} />
       </Routes>
     </Router>
   );
