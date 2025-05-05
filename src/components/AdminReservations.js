@@ -1,23 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/AdminReservations.css';
-import { FaTrash } from 'react-icons/fa'; // For the remove icon
-import Logout from './Logout'; // Import Logout component
+import { FaTrash } from 'react-icons/fa'; 
+import Logout from './Logout'; 
 
 const AdminReservations = () => {
   const [reservations, setReservations] = useState([]);
   const [selectedReservation, setSelectedReservation] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [showLogoutModal, setShowLogoutModal] = useState(false); // State for logout modal
+  const [showLogoutModal, setShowLogoutModal] = useState(false); 
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Fetch reservations from localStorage
     const storedReservations = JSON.parse(localStorage.getItem('pendingReservations')) || [];
-    // Ensure `equipment` is always an array
     const formattedReservations = storedReservations.map((res) => ({
       ...res,
-      equipment: res.equipment || [], // Default to empty array if undefined
+      equipment: res.equipment || [], 
     }));
     setReservations(formattedReservations);
   }, []);
@@ -65,7 +63,7 @@ const AdminReservations = () => {
               onClick={() => {
                 if (item === 'Inventory') navigate('/admin/inventory');
                 if (item === 'Statistics') navigate('/admin/statistics');
-                if (item === 'Logout') setShowLogoutModal(true); // Show logout modal
+                if (item === 'Logout') setShowLogoutModal(true); 
               }}
             >
               {item}
