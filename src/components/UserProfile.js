@@ -30,8 +30,7 @@ const UserProfile = () => {
   return (
     <div className="dashboard-container">
       <div className="sidebar">
-        <img src="/dlsl-logo.png" alt="DLSL Logo" className="logo" />
-        <div className="sidebar-title">MHUB Reservation</div>
+        <img src="/mhublogo.png" alt="DLSL Logo" className="logo" />
         <ul>
           <li onClick={() => navigate('/dashboard')}>Dashboard</li>
           <li onClick={() => navigate('/borrow')}>Borrow Item</li>

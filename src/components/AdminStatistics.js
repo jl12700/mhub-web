@@ -38,8 +38,7 @@ const AdminStatistics = () => {
   return (
     <div className="dashboard-container">
       <div className="sidebar">
-        <img src="/dlsl-logo.png" alt="DLSL Logo" className="logo" />
-        <div className="sidebar-title">MHUB Reservation</div>
+        <img src="/mhublogo.png" alt="DLSL Logo" className="logo" />
         <ul>
           {['Reservations', 'Inventory', 'Statistics', 'Logout'].map((item) => (
             <li

@@ -16,7 +16,7 @@ const Dashboard = () => {
   useEffect(() => {
     const storedApprovals = JSON.parse(localStorage.getItem('pendingReservations')) || [];
     setPendingApprovals(storedApprovals);
-    
+
     const user = JSON.parse(localStorage.getItem('user'));
     if (user) {
       setUserType(user.userType);
@@ -25,12 +25,28 @@ const Dashboard = () => {
 
   const handleNavigation = (item) => {
     setActiveItem(item);
-    if (item === 'Borrow Item') navigate('/borrow');
-    if (item === 'User Profile') navigate('/profile');
-    if (item === 'Logout') setShowLogoutModal(true);
-    if (item === 'Reservations') navigate('/admin/reservations');
-    if (item === 'Inventory') navigate('/admin/inventory');
-    if (item === 'Statistics') navigate('/admin/statistics');
+    switch (item) {
+      case 'Borrow Item':
+        navigate('/borrow');
+        break;
+      case 'User Profile':
+        navigate('/profile');
+        break;
+      case 'Logout':
+        setShowLogoutModal(true);
+        break;
+      case 'Reservations':
+        navigate('/admin/reservations');
+        break;
+      case 'Inventory':
+        navigate('/admin/inventory');
+        break;
+      case 'Statistics':
+        navigate('/admin/statistics');
+        break;
+      default:
+        break;
+    }
   };
 
   const adminSidebarItems = ['Reservations', 'Inventory', 'Statistics', 'Logout'];
@@ -39,8 +55,7 @@ const Dashboard = () => {
   return (
     <div className="dashboard-container">
       <div className="sidebar">
-        <img src="/dlsl-logo.png" alt="DLSL Logo" className="logo" />
-        <div className="sidebar-title">MHUB Reservation</div>
+        <img src="/mhublogo.png" alt="DLSL Logo" className="logo" />
         <ul>
           {(userType === 'admin' ? adminSidebarItems : userSidebarItems).map((item) => (
             <li
@@ -56,12 +71,11 @@ const Dashboard = () => {
       </div>
 
       <div className="main-content">
-        {userType === 'admin' ? (
-          <div className="admin-welcome">
-            <h1>Welcome, Admin!</h1>
-            <p>Please use the sidebar to manage reservations, inventory, and view statistics.</p>
-          </div>
-        ) : (
+        <div className="header">
+        <h1 className="no-underline">Dashboard Overview </h1>
+        </div>
+
+        {userType !== 'admin' && (
           <div className="tiles-container">
             <div className="tile">
               <div className="tile-header">Reservation History</div>
@@ -69,7 +83,9 @@ const Dashboard = () => {
                 {reservationHistory.length > 0 ? (
                   <ul>
                     {reservationHistory.map((res) => (
-                      <li key={res.id}>{res.item} - {res.date}</li>
+                      <li key={res.id}>
+                        {res.item} - {res.date}
+                      </li>
                     ))}
                   </ul>
                 ) : (
@@ -77,13 +93,16 @@ const Dashboard = () => {
                 )}
               </div>
             </div>
+
             <div className="tile">
-              <div className="tile-header">User Reservations</div>
+              <div className="tile-header">Active Reservations</div>
               <div className="tile-content">
                 {userReservations.length > 0 ? (
                   <ul>
                     {userReservations.map((res) => (
-                      <li key={res.id}>{res.item} - {res.date}</li>
+                      <li key={res.id}>
+                        {res.item} - {res.date}
+                      </li>
                     ))}
                   </ul>
                 ) : (
@@ -91,23 +110,25 @@ const Dashboard = () => {
                 )}
               </div>
             </div>
+
             <div className="tile">
-              <div className="tile-header">Out of Stock Equipment</div>
+              <div className="tile-header">Out of Stock</div>
               <div className="tile-content">
-                {outOfStockEquipment.length > 0 ? (
-                  outOfStockEquipment.join(', ')
-                ) : (
-                  'All equipment is available.'
-                )}
+                {outOfStockEquipment.length > 0
+                  ? outOfStockEquipment.join(', ')
+                  : 'All equipment is available.'}
               </div>
             </div>
+
             <div className="tile">
               <div className="tile-header">Pending Approvals</div>
               <div className="tile-content">
                 {pendingApprovals.length > 0 ? (
                   <ul>
                     {pendingApprovals.map((res, index) => (
-                      <li key={index}>{res.item} - Pickup: {res.pickupDate}</li>
+                      <li key={index}>
+                        {res.item} - Pickup: {res.pickupDate}
+                      </li>
                     ))}
                   </ul>
                 ) : (
