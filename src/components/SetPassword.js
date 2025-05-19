@@ -21,7 +21,7 @@ const SetPassword = () => {
     <div className="set-password-container">
       <h2>Set Your Password</h2>
       <form onSubmit={handleSubmit}>
-        <div className="form-group">
+        <div className="spform-group">
           <label>New Password:</label>
           <input
             type="password"
@@ -30,7 +30,7 @@ const SetPassword = () => {
             required
           />
         </div>
-        <div className="form-group">
+        <div className="spform-group">
           <label>Confirm Password:</label>
           <input
             type="password"

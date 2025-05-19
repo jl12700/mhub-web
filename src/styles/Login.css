@@ -22,13 +22,12 @@ body {
    
 }
 
-.logo {
-    width: 150px;  
-    height: 180px;
+.llogo {
+    width: 170px;  
+    height: 200px;
     margin-top: 1px;
     margin-bottom: 1px;
 }
-
 
 
 .login-container h2 {
@@ -38,19 +37,19 @@ body {
     margin-top: 1px;
 }
 
-.form-group {
+.lform-group {
     margin-bottom: 12px;
     text-align: left;
     margin-right: 15px;
     
 }
 
-.form-group.drop {
+.lform-group.drop {
     margin-bottom: 12px;
     text-align: left;
     margin-left: 0;  
 }
-.form-group.drop select {
+.lform-group.drop select {
     height: 30px;
    
 }

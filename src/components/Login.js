@@ -49,10 +49,10 @@ const Login = () => {
 
   return (
     <div className="login-container">
-      <img src="/dlsl-logo.png" alt="DLSL Logo" className="logo" />
+      <img src="/dlsl-logo.png" alt="DLSL Logo" className="llogo" />
       <h2>MHUB Reservation</h2>
       <form onSubmit={handleSubmit}>
-        <div className="form-group drop">
+        <div className="lform-group drop">
           <label>Role:</label>
           <select
             value={userType}
@@ -64,7 +64,7 @@ const Login = () => {
             <option value="admin">Admin</option>
           </select>
         </div>
-        <div className="form-group">
+        <div className="lform-group">
           <label>Email:</label>
           <input
             type="text"
@@ -73,7 +73,7 @@ const Login = () => {
             required
           />
         </div>
-        <div className="form-group">
+        <div className="lform-group">
           <label>ID Number:</label>
           <input
             type="text"
@@ -82,7 +82,7 @@ const Login = () => {
             required
           />
         </div>
-        <div className="form-group">
+        <div className="lform-group">
           <label>Password:</label>
           <input
             type="password"

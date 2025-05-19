@@ -1,158 +1,232 @@
-body {
-  margin: 0;
-  padding: 0;
-  font-family: Arial, sans-serif;
-  background-color: #f0f8f0;
+.Sequipment-table thead {
+  position: sticky;
+  top: 0;
+  background-color: #f9f9f9;
+  z-index: 10;
+}/* AdminEquipmentManager.css */
+.admin-controls {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+}
+
+.add-button {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 15px;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.3s;
+}
+
+.add-button:hover {
+  background-color: #45a049;
+}
+
+.Sequipment-table .action-buttons {
   display: flex;
   justify-content: center;
-  align-items: center;
-  height: 100vh;
+  gap: 10px;
+  height: 100%; /* Make the container take full height of the cell */
+  align-items: center; /* Vertically center the buttons */
 }
 
-.dashboard-container {
+.edit-btn, .delete-btn {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 3px;
+  transition: background-color 0.2s;
+}
+
+.edit-btn {
+  color: #2196f3;
+}
+
+.edit-btn:hover {
+  background-color: rgba(33, 150, 243, 0.1);
+}
+
+.delete-btn {
+  color: #f44336;
+}
+
+.delete-btn:hover {
+  background-color: rgba(244, 67, 54, 0.1);
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
-  height: 100vh;
-  width: 100vw;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
 }
 
-.sidebar {
-  width: 200px;
-  min-height: 100vh;
-  background-color: #232428;
+.equipment-modal {
+  background-color: white;
+  border-radius: 8px;
+  padding: 25px;
+  width: 500px;
+  max-width: 90%;
+}
+
+.equipment-modal h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+
+
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.cancel-btn,
+.save-btn {
+  padding: 8px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.cancel-btn {
+  background-color: #f5f5f5;
+  color: #333;
+}
+
+.cancel-btn:hover {
+  background-color: #e0e0e0;
+}
+
+.save-btn {
+  background-color: #2196f3;
   color: white;
-  padding: 20px;
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
 }
 
-.sidebar .logo {
-  width: 180px;
-  height: 200px;
-  margin-bottom: 20px;
+.save-btn:hover {
+  background-color: #0b7dda;
 }
 
-.sidebar-title {
-  font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 20px;
+.loading {
   text-align: center;
+  padding: 20px;
+  font-style: italic;
+  color: #666;
 }
 
-.sidebar ul {
-  list-style: none;
-  padding: 0;
+/* Ensure this works with your existing styles */
+.Sequipment-table-container {
+  margin-top: 20px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  max-height: 500px; /* Set a fixed height for scrolling */
+  overflow-y: auto; /* Enable vertical scrolling */
+  max-width: 100%;
   width: 100%;
 }
 
-.sidebar ul li {
-  margin-bottom: 15px;
-  cursor: pointer;
-  text-align: left;
-  padding: 10px 15px;
-  border-radius: 5px;
-  transition: background 0.3s;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.actions-center {
+  text-align: right;
+  padding-right: 410px; /* Adjust this value as needed */
 }
 
-.sidebar ul li:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-}
-
-.sidebar ul .active {
-  background-color: rgba(255, 255, 255, 0.3);
-  font-weight: bold;
-  text-decoration: none;
-}
-
-.arrow {
-  font-size: 16px;
-  margin-left: auto;
-}
-
-.main-content {
-  flex-grow: 1;
-  background-color: white;
-  border-radius: 10px;
-  margin: 20px;
-  padding: 40px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  text-align: left;
-}
-
-.main-content h1 {
-  color: #2c3e50;
-  margin-bottom: 20px;
-}
-
-.main-content table {
+.Sequipment-table {
   width: 100%;
   border-collapse: collapse;
-  background-color: white;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  table-layout: auto; /* or fixed if you want consistent column widths */
 }
 
-.main-content th,
-.main-content td {
-  padding: 12px;
+.Sequipment-table th,
+.Sequipment-table td {
+  padding: 20px;
   text-align: left;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid #eee;
+  vertical-align: middle; /* Add this to vertically center all content */
+}
+.Sequipment-table th.text-center {
+  text-align: center; /* Keep it centered horizontally */
+  vertical-align: middle; /* Add vertical centering */
+}
+.Sequipment-table th {
+  background-color: #f9f9f9;
+  font-weight: 600;
 }
 
-.main-content th {
-  background-color: #232428;
-  color: white;
-}
-
-.main-content tr:hover {
-  background-color: #f1f1f1;
-}
-
-.main-content input[type="number"] {
-  width: 60px;
-  padding: 5px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
+.text-center {
   text-align: center;
 }
 
-.main-content button {
-  padding: 8px 12px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  margin-left: 5px;
+.Sequipment-row:hover {
+  background-color: #f5f5f5;
 }
 
-.main-content button:hover {
-  background-color: #1abc9c;
-  color: white;
+.Sequipment-table th.action-header {
+  text-align: right;
+  padding-right: 170px; /* Adjust this value as needed */
 }
 
-.main-content .btn-group {
-  display: flex;
-  align-items: center;
+/* If you need to adjust the column widths */
+.Sequipment-table th:first-child,
+.Sequipment-table td:first-child {
+  width: 20%;
 }
 
-.btn-save {
-  background-color: #4CAF50;
-  color: white;
-  padding: 12px 20px;
-  margin-top: 20px;
-  border-radius: 5px;
-  font-weight: bold;
-  transition: background-color 0.3s;
+.Sequipment-table th:nth-child(2),
+.Sequipment-table td:nth-child(2) {
+  width: 20%;
+  text-align: center;
 }
 
-.btn-save:hover {
-  background-color: lightgreen;
+.Sequipment-table th:last-child,
+.Sequipment-table td:last-child {
+  width: 20%;
+}
+.no-results {
+  text-align: center;
+  padding: 20px;
+  font-style: italic;
+  color: #666;
 }
