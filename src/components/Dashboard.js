@@ -12,15 +12,53 @@ const Dashboard = () => {
   const [userReservations, setUserReservations] = useState([]);
   const [outOfStockEquipment, setOutOfStockEquipment] = useState([]);
   const [pendingApprovals, setPendingApprovals] = useState([]);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const refreshData = () => {
+    setRefreshKey(oldKey => oldKey + 1);
+  };
 
   useEffect(() => {
-    const storedApprovals = JSON.parse(localStorage.getItem('pendingReservations')) || [];
-    setPendingApprovals(storedApprovals);
-
+    const storedReservations = JSON.parse(localStorage.getItem('pendingReservations')) || [];
+    
     const user = JSON.parse(localStorage.getItem('user'));
     if (user) {
       setUserType(user.userType);
+      
+      const userEmail = user.email || localStorage.getItem('userName');
+      
+      const pending = storedReservations.filter(
+        res => res.status === 'Pending' && res.userName === userEmail
+      );
+      
+      const active = storedReservations.filter(
+        res => res.status === 'Accepted' && res.userName === userEmail
+      );
+      
+      const history = storedReservations.filter(
+        res => (res.status === 'Returned' || res.status === 'Declined' || res.status === 'Damaged') 
+        && res.userName === userEmail
+      );
+      
+      setPendingApprovals(pending);
+      setUserReservations(active);
+      setReservationHistory(history);
     }
+    
+    setOutOfStockEquipment(['Printer']);
+  }, [refreshKey]); 
+
+  useEffect(() => {
+    const handleStorageChange = (event) => {
+      if (event.key === 'pendingReservations') {
+        refreshData();
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, []);
 
   const handleNavigation = (item) => {
@@ -52,6 +90,11 @@ const Dashboard = () => {
   const adminSidebarItems = ['Reservations', 'Inventory', 'Statistics', 'Logout'];
   const userSidebarItems = ['Dashboard', 'Borrow Item', 'User Profile', 'Logout'];
 
+  const formatReservationItem = (res) => {
+    const itemNames = res.items ? res.items.map(item => `${item.name} (${item.quantity})`).join(', ') : 'No items';
+    return `${itemNames} - Pickup: ${res.pickupDate}`;
+  };
+
   return (
     <div className="dashboard-container">
       <div className="sidebar">
@@ -72,7 +115,8 @@ const Dashboard = () => {
 
       <div className="main-content">
         <div className="header">
-        <h1 className="no-underline">Dashboard Overview </h1>
+          <h1 className="no-underline">Dashboard Overview </h1>
+          
         </div>
 
         {userType !== 'admin' && (
@@ -82,9 +126,16 @@ const Dashboard = () => {
               <div className="tile-content">
                 {reservationHistory.length > 0 ? (
                   <ul>
-                    {reservationHistory.map((res) => (
-                      <li key={res.id}>
-                        {res.item} - {res.date}
+                    {reservationHistory.map((res, index) => (
+                      <li key={index}>
+                        {formatReservationItem(res)}
+                        <span className="status-badge" style={{ 
+                          backgroundColor: res.status === 'Returned' ? 'blue' : 
+                                           res.status === 'Declined' ? 'red' : 
+                                           res.status === 'Damaged' ? 'orange' : 'gray' 
+                        }}>
+                          {res.status}
+                        </span>
                       </li>
                     ))}
                   </ul>
@@ -99,9 +150,12 @@ const Dashboard = () => {
               <div className="tile-content">
                 {userReservations.length > 0 ? (
                   <ul>
-                    {userReservations.map((res) => (
-                      <li key={res.id}>
-                        {res.item} - {res.date}
+                    {userReservations.map((res, index) => (
+                      <li key={index}>
+                        {formatReservationItem(res)}
+                        <span className="status-badge" style={{ backgroundColor: 'green' }}>
+                          {res.status}
+                        </span>
                       </li>
                     ))}
                   </ul>
@@ -127,7 +181,10 @@ const Dashboard = () => {
                   <ul>
                     {pendingApprovals.map((res, index) => (
                       <li key={index}>
-                        {res.item} - Pickup: {res.pickupDate}
+                        {formatReservationItem(res)}
+                        <span className="status-badge" style={{ backgroundColor: 'gray' }}>
+                          {res.status}
+                        </span>
                       </li>
                     ))}
                   </ul>

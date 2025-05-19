@@ -1,15 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Logout from './Logout';
-import { supabase } from '../supabaseClient';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
-  faSearch, 
-  faCheck, 
-  faTimes, 
-  faEdit,
-  faSave
-} from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faCheck, faTimes, faEdit,faSave,faFilter,faSync} from '@fortawesome/free-solid-svg-icons';
 import '../styles/AdminReservations.css';
 
 const AdminReservations = () => {
@@ -20,8 +13,9 @@ const AdminReservations = () => {
   const [selectedReservation, setSelectedReservation] = useState(null);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [filterStatus, setFilterStatus] = useState('All');
+  const [showFilters, setShowFilters] = useState(false);
 
-  // Fetch reservations from Supabase
   useEffect(() => {
     fetchReservations();
   }, []);
@@ -29,27 +23,19 @@ const AdminReservations = () => {
   const fetchReservations = async () => {
     try {
       setLoading(true);
-      // In a real application, this would be a Supabase query
-      // const { data, error } = await supabase
-      //   .from('reservations')
-      //   .select('*')
-      //   .order('created_at', { ascending: false });
-
-      // if (error) throw error;
       
-      // For demo purposes, we'll use localStorage
       const storedReservations = JSON.parse(localStorage.getItem('pendingReservations')) || [];
       
-      // Add ID, user details, and default status if not present
       const processedReservations = storedReservations.map(reservation => {
         if (!reservation.id) {
-          // In a real app, you'd get this from user authentication
-          const userName = localStorage.getItem('userName') || 'john@dlsl.edu.ph'; 
+          
+          const userName = reservation.userName || localStorage.getItem('userName') || 'student@dlsl.edu.ph'; 
           return {
             ...reservation,
             id: generateReservationId(),
             userName: userName,
-            status: 'Pending'
+            status: reservation.status || 'Pending',
+            created_at: reservation.created_at || new Date().toISOString()
           };
         }
         return reservation;
@@ -57,7 +43,6 @@ const AdminReservations = () => {
       
       setReservations(processedReservations);
       
-      // Save the processed reservations back to localStorage
       localStorage.setItem('pendingReservations', JSON.stringify(processedReservations));
     } catch (err) {
       alert('Failed to load reservations: ' + err.message);
@@ -66,32 +51,27 @@ const AdminReservations = () => {
     }
   };
 
-  // Generate a unique ID for each reservation
+
   const generateReservationId = () => {
     return Math.floor(100000 + Math.random() * 900000).toString();
   };
 
-  // Handle approving a reservation
   const handleApprove = async (id) => {
     try {
       setLoading(true);
-      // In a real app, this would update Supabase
-      // const { error } = await supabase
-      //   .from('reservations')
-      //   .update({ status: 'Accepted' })
-      //   .eq('id', id);
       
-      // if (error) throw error;
-      
-      // For demo purposes, update the local state
-      setReservations(prevReservations => 
-        prevReservations.map(reservation => 
-          reservation.id === id ? { ...reservation, status: 'Accepted' } : reservation
-        )
+      const updatedReservations = reservations.map(reservation => 
+        reservation.id === id ? { ...reservation, status: 'Accepted' } : reservation
       );
       
-      // Update localStorage
-      updateLocalStorage('Accepted', id);
+      setReservations(updatedReservations);
+      
+     
+      localStorage.setItem('pendingReservations', JSON.stringify(updatedReservations));
+      
+     
+      window.dispatchEvent(new Event('reservationUpdated'));
+      
       alert('Reservation approved successfully!');
     } catch (err) {
       alert('Failed to approve reservation: ' + err.message);
@@ -100,20 +80,20 @@ const AdminReservations = () => {
     }
   };
 
-  // Handle rejecting a reservation
   const handleReject = async (id) => {
     try {
       setLoading(true);
-      // In a real app, this would update Supabase
-      // For demo purposes, update the local state
-      setReservations(prevReservations => 
-        prevReservations.map(reservation => 
-          reservation.id === id ? { ...reservation, status: 'Declined' } : reservation
-        )
+      
+      const updatedReservations = reservations.map(reservation => 
+        reservation.id === id ? { ...reservation, status: 'Declined' } : reservation
       );
       
-      // Update localStorage
-      updateLocalStorage('Declined', id);
+      setReservations(updatedReservations);
+      
+      localStorage.setItem('pendingReservations', JSON.stringify(updatedReservations));
+ 
+      window.dispatchEvent(new Event('reservationUpdated'));
+      
       alert('Reservation declined successfully!');
     } catch (err) {
       alert('Failed to decline reservation: ' + err.message);
@@ -122,28 +102,27 @@ const AdminReservations = () => {
     }
   };
 
-  // Open status edit modal
   const openStatusModal = (reservation) => {
     setSelectedReservation(reservation);
     setShowStatusModal(true);
   };
 
-  // Handle status change
   const handleStatusChange = async (newStatus) => {
     if (selectedReservation) {
       try {
         setLoading(true);
-        // In a real app, this would update Supabase
-        
-        // For demo purposes, update the local state
-        setReservations(prevReservations => 
-          prevReservations.map(reservation => 
-            reservation.id === selectedReservation.id ? { ...reservation, status: newStatus } : reservation
-          )
+      
+        const updatedReservations = reservations.map(reservation => 
+          reservation.id === selectedReservation.id ? { ...reservation, status: newStatus } : reservation
         );
         
-        // Update localStorage
-        updateLocalStorage(newStatus, selectedReservation.id);
+        setReservations(updatedReservations);
+        
+        
+        localStorage.setItem('pendingReservations', JSON.stringify(updatedReservations));
+    
+        window.dispatchEvent(new Event('reservationUpdated'));
+        
         setShowStatusModal(false);
         alert('Status updated successfully!');
       } catch (err) {
@@ -154,29 +133,23 @@ const AdminReservations = () => {
     }
   };
 
-  // Update localStorage with new status
-  const updateLocalStorage = (newStatus, id) => {
-    const updatedReservations = reservations.map(reservation => 
-      reservation.id === id ? { ...reservation, status: newStatus } : reservation
-    );
-    localStorage.setItem('pendingReservations', JSON.stringify(updatedReservations));
-  };
+  const filteredReservations = reservations.filter(reservation => {
+    const matchesSearch = 
+      reservation.id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      reservation.userName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      reservation.activity?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      reservation.usageLocation?.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesFilter = filterStatus === 'All' || reservation.status === filterStatus;
+    
+    return matchesSearch && matchesFilter;
+  });
 
-  // Filter reservations based on search term
-  const filteredReservations = reservations.filter(reservation => 
-    reservation.id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    reservation.userName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    reservation.activity?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    reservation.usageLocation?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  // Get display text for items
   const getEquipmentText = (items) => {
     if (!items || items.length === 0) return 'No items';
     return items.map(item => `${item.name} (${item.quantity})`).join(', ');
   };
 
-  // Status colors
   const getStatusColor = (status) => {
     switch(status) {
       case 'Accepted': return 'green';
@@ -186,6 +159,12 @@ const AdminReservations = () => {
       default: return 'gray';
     }
   };
+
+  const prioritizedReservations = [...filteredReservations].sort((a, b) => {
+    if (a.status === 'Pending' && b.status !== 'Pending') return -1;
+    if (a.status !== 'Pending' && b.status === 'Pending') return 1;
+    return new Date(b.created_at) - new Date(a.created_at);
+  });
 
   return (
     <div className="dashboard-container">
@@ -214,15 +193,54 @@ const AdminReservations = () => {
         <div className="header">
           <h1 className="no-underline">Reservation Management</h1>
           <div className="search-container">
-            <input 
-              type="text" 
-              className="search-bar"
-              placeholder="Search by ID or Name" 
-              value={searchTerm} 
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <FontAwesomeIcon icon={faSearch} className="search-icon" />
+  <input 
+    type="text" 
+    className="search-bar"
+    placeholder="Search by ID or Name" 
+    value={searchTerm} 
+    onChange={(e) => setSearchTerm(e.target.value)}
+  />
+  <FontAwesomeIcon icon={faSearch} className="search-icon" />
+  
+  <button 
+    className="filter-btn"
+    onClick={() => setShowFilters(!showFilters)}
+    title="Filter"
+  >
+    <FontAwesomeIcon icon={faFilter} />
+  </button>
+  
+  <button 
+    className="refresh-btn"
+    onClick={fetchReservations}
+    title="Refresh data"
+  >
+    <FontAwesomeIcon icon={faSync} />
+  </button>
+</div>
+        </div>
+        
+        {showFilters && (
+          <div className="filter-controls">
+            <div className="filter-group">
+              <label>Status:</label>
+              <select 
+                value={filterStatus} 
+                onChange={(e) => setFilterStatus(e.target.value)}
+              >
+                <option value="All">All</option>
+                <option value="Pending">Pending</option>
+                <option value="Accepted">Accepted</option>
+                <option value="Declined">Declined</option>
+                <option value="Returned">Returned</option>
+                <option value="Damaged">Damaged</option>
+              </select>
+            </div>
           </div>
+        )}
+
+        <div className="pending-count">
+          <span>{reservations.filter(r => r.status === 'Pending').length} pending requests</span>
         </div>
 
         <div className="equipment-table-container">
@@ -241,9 +259,9 @@ const AdminReservations = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredReservations.length > 0 ? (
-                filteredReservations.map((reservation) => (
-                  <tr key={reservation.id} className="equipment-row">
+              {prioritizedReservations.length > 0 ? (
+                prioritizedReservations.map((reservation) => (
+                  <tr key={reservation.id} className={`equipment-row ${reservation.status === 'Pending' ? 'pending-row' : ''}`}>
                     <td>{reservation.id}</td>
                     <td>{reservation.userName}</td>
                     <td>{getEquipmentText(reservation.items)}</td>
@@ -300,7 +318,6 @@ const AdminReservations = () => {
         </div>
       </div>
 
-      {/* Status Edit Modal */}
       {showStatusModal && selectedReservation && (
         <div className="modal-overlay">
           <div className="modal reservation-modal">
@@ -312,6 +329,10 @@ const AdminReservations = () => {
             <div className="form-group">
               <label>User:</label>
               <span className="modal-info">{selectedReservation?.userName}</span>
+            </div>
+            <div className="form-group">
+              <label>Equipment:</label>
+              <span className="modal-info">{getEquipmentText(selectedReservation?.items)}</span>
             </div>
             <div className="form-group">
               <label>Current Status:</label>

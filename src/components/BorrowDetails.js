@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import '../styles/BorrowDetails.css';
-import Logout from './Logout'; // Import Logout component
+import Logout from './Logout'; 
 
 const BorrowDetails = () => {
   const location = useLocation();
@@ -15,7 +15,7 @@ const BorrowDetails = () => {
   const [usageLocation, setUsageLocation] = useState('');
   const [minDate, setMinDate] = useState('');
   const [modalError, setModalError] = useState('');
-  const [showLogoutModal, setShowLogoutModal] = useState(false); // State for logout modal
+  const [showLogoutModal, setShowLogoutModal] = useState(false); 
 
   useEffect(() => {
     if (!selectedItems || selectedItems.length === 0) {
@@ -64,12 +64,18 @@ const BorrowDetails = () => {
 
   const handleConfirm = () => {
     if (validateForm()) {
+      const user = JSON.parse(localStorage.getItem('user'));
+      const userEmail = user?.email || localStorage.getItem('userName');
+
       const newReservation = {
         items: selectedItems,
         pickupDate,
         pickupTime,
+        returnTime,
         activity,
         usageLocation,
+        status: 'Pending', // ✅ Add status
+        userName: userEmail // ✅ Add userName for filtering in Dashboard
       };
 
       const storedReservations = JSON.parse(localStorage.getItem('pendingReservations')) || [];
@@ -90,7 +96,7 @@ const BorrowDetails = () => {
           <li onClick={() => navigate('/dashboard')}>Dashboard</li>
           <li className="active">Borrow Item</li>
           <li onClick={() => navigate('/profile')}>User Profile</li>
-          <li onClick={() => setShowLogoutModal(true)}>Logout</li> {/* Show logout modal */}
+          <li onClick={() => setShowLogoutModal(true)}>Logout</li>
         </ul>
       </div>
 
@@ -114,12 +120,15 @@ const BorrowDetails = () => {
           <div className="selected-items">
             <h3>Selected Equipment:</h3>
             <ul>
-              {selectedItems.map((item, index) => (
-                <li key={index}>
-                  {item.name} (Qty: {item.quantity})
-                </li>
-              ))}
-            </ul>
+  {selectedItems.map((item, index) => (
+    <li key={index} className="equipment-item">
+      <div className="item-name">{item.name} (Qty: {item.quantity})</div>
+      <div className={`status ${item.status?.toLowerCase() || 'pending'}`}>
+        {item.status || 'Pending'}
+      </div>
+    </li>
+  ))}
+</ul>
           </div>
 
           <div className="reservation-form">
@@ -127,10 +136,20 @@ const BorrowDetails = () => {
             <input type="date" min={minDate} value={pickupDate} onChange={(e) => setPickupDate(e.target.value)} />
 
             <label>Activity Purpose:</label>
-            <input type="text" value={activity} onChange={(e) => setActivity(e.target.value)} placeholder="e.g., School Presentation" />
+            <input
+              type="text"
+              value={activity}
+              onChange={(e) => setActivity(e.target.value)}
+              placeholder="e.g., School Presentation"
+            />
 
             <label>Usage Location:</label>
-            <input type="text" value={usageLocation} onChange={(e) => setUsageLocation(e.target.value)} placeholder="e.g., Room 203" />
+            <input
+              type="text"
+              value={usageLocation}
+              onChange={(e) => setUsageLocation(e.target.value)}
+              placeholder="e.g., Room 203"
+            />
 
             <div className="time-fields">
               <div>
@@ -145,10 +164,11 @@ const BorrowDetails = () => {
           </div>
         </div>
 
-        <button className="confirm-button" onClick={handleConfirm}>Confirm</button>
+        <button className="confirm-button" onClick={handleConfirm}>
+          Confirm
+        </button>
       </div>
 
-      {/* Logout Modal */}
       {showLogoutModal && <Logout setShowModal={setShowLogoutModal} />}
     </div>
   );
