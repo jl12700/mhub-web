@@ -1,18 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import '../styles/BorrowDetails.css';
+import Logout from './Logout'; 
 
 const BorrowDetails = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { selectedItems } = location.state || { selectedItems: [] };
-
-  useEffect(() => {
-    if (!selectedItems || selectedItems.length === 0) {
-      alert('No items selected. Redirecting to Borrow Item page.');
-      navigate('/borrow-item');
-    }
-  }, [selectedItems, navigate]);
 
   const [pickupDate, setPickupDate] = useState('');
   const [pickupTime, setPickupTime] = useState('');
@@ -21,6 +15,14 @@ const BorrowDetails = () => {
   const [usageLocation, setUsageLocation] = useState('');
   const [minDate, setMinDate] = useState('');
   const [modalError, setModalError] = useState('');
+  const [showLogoutModal, setShowLogoutModal] = useState(false); 
+
+  useEffect(() => {
+    if (!selectedItems || selectedItems.length === 0) {
+      alert('No items selected. Redirecting to Borrow Item page.');
+      navigate('/borrow');
+    }
+  }, [selectedItems, navigate]);
 
   useEffect(() => {
     const today = new Date();
@@ -62,6 +64,25 @@ const BorrowDetails = () => {
 
   const handleConfirm = () => {
     if (validateForm()) {
+      const user = JSON.parse(localStorage.getItem('user'));
+      const userEmail = user?.email || localStorage.getItem('userName');
+
+      const newReservation = {
+        items: selectedItems,
+        pickupDate,
+        pickupTime,
+        returnTime,
+        activity,
+        usageLocation,
+        status: 'Pending', // ✅ Add status
+        userName: userEmail // ✅ Add userName for filtering in Dashboard
+      };
+
+      const storedReservations = JSON.parse(localStorage.getItem('pendingReservations')) || [];
+      const updatedReservations = [...storedReservations, newReservation];
+
+      localStorage.setItem('pendingReservations', JSON.stringify(updatedReservations));
+
       alert('Reservation confirmed!');
       navigate('/dashboard');
     }
@@ -70,66 +91,85 @@ const BorrowDetails = () => {
   return (
     <div className="dashboard-container">
       <div className="sidebar">
-        <img src="/dlsl-logo.png" alt="DLSL Logo" className="logo" />
-        <div className="sidebar-title">MHUB Reservation</div>
+        <img src="/mhublogo.png" alt="DLSL Logo" className="logo" />
         <ul>
           <li onClick={() => navigate('/dashboard')}>Dashboard</li>
           <li className="active">Borrow Item</li>
           <li onClick={() => navigate('/profile')}>User Profile</li>
-          <li onClick={() => navigate('/logout')}>Logout</li>
+          <li onClick={() => setShowLogoutModal(true)}>Logout</li>
         </ul>
       </div>
 
       <div className="main-content">
-        <div className="header">
-          <h1>Confirm Your Reservation</h1>
-          <p>Review your selected items and provide the necessary details.</p>
-        </div>
+        <button className="back-button" onClick={() => navigate('/borrow')}>
+          Back
+        </button>
+        <h1>Confirm Your Reservation</h1>
+        <p>Review your selected items and provide the necessary details.</p>
 
-        <div className="equipment-grid">
-          {selectedItems.map((item) => (
-            <div key={item.id} className="equipment-card">
-              <img src={item.image} alt={item.name} className="equipment-image" />
-              <h3>{item.name}</h3>
-              <p>Quantity: {item.quantity}</p>
-            </div>
-          ))}
-        </div>
-
-        <div className="reservation-form">
-          <label>Pickup Date:</label>
-          <input type="date" min={minDate} value={pickupDate} onChange={(e) => setPickupDate(e.target.value)} />
-
-          <label>Activity Purpose:</label>
-          <input type="text" value={activity} onChange={(e) => setActivity(e.target.value)} placeholder="e.g., School Presentation" />
-
-          <label>Usage Location:</label>
-          <input type="text" value={usageLocation} onChange={(e) => setUsageLocation(e.target.value)} placeholder="e.g., Room 203" />
-
-          <div className="time-fields">
-            <div>
-              <label>Pickup Time:</label>
-              <input type="time" value={pickupTime} onChange={(e) => setPickupTime(e.target.value)} />
-            </div>
-            <div>
-              <label>Return Time:</label>
-              <input type="time" value={returnTime} onChange={(e) => setReturnTime(e.target.value)} />
-            </div>
-          </div>
-        </div>
-
-        <button className="confirm-button" onClick={handleConfirm}>Confirm</button>
-
-        {/* Modal for Validation Errors */}
         {modalError && (
           <div className="modal-overlay">
             <div className="modal">
               <p>{modalError}</p>
-              <button onClick={() => setModalError('')}>OK</button>
+              <button onClick={() => setModalError('')}>Close</button>
             </div>
           </div>
         )}
+
+        <div className="details-layout">
+          <div className="selected-items">
+            <h3>Selected Equipment:</h3>
+            <ul>
+  {selectedItems.map((item, index) => (
+    <li key={index} className="equipment-item">
+      <div className="item-name">{item.name} (Qty: {item.quantity})</div>
+      <div className={`status ${item.status?.toLowerCase() || 'pending'}`}>
+        {item.status || 'Pending'}
       </div>
+    </li>
+  ))}
+</ul>
+          </div>
+
+          <div className="reservation-form">
+            <label>Pickup Date:</label>
+            <input type="date" min={minDate} value={pickupDate} onChange={(e) => setPickupDate(e.target.value)} />
+
+            <label>Activity Purpose:</label>
+            <input
+              type="text"
+              value={activity}
+              onChange={(e) => setActivity(e.target.value)}
+              placeholder="e.g., School Presentation"
+            />
+
+            <label>Usage Location:</label>
+            <input
+              type="text"
+              value={usageLocation}
+              onChange={(e) => setUsageLocation(e.target.value)}
+              placeholder="e.g., Room 203"
+            />
+
+            <div className="time-fields">
+              <div>
+                <label>Pickup Time:</label>
+                <input type="time" value={pickupTime} onChange={(e) => setPickupTime(e.target.value)} />
+              </div>
+              <div>
+                <label>Return Time:</label>
+                <input type="time" value={returnTime} onChange={(e) => setReturnTime(e.target.value)} />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button className="confirm-button" onClick={handleConfirm}>
+          Confirm
+        </button>
+      </div>
+
+      {showLogoutModal && <Logout setShowModal={setShowLogoutModal} />}
     </div>
   );
 };

@@ -1,0 +1,232 @@
+.Sequipment-table thead {
+  position: sticky;
+  top: 0;
+  background-color: #f9f9f9;
+  z-index: 10;
+}/* AdminEquipmentManager.css */
+.admin-controls {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+}
+
+.add-button {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 15px;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.3s;
+}
+
+.add-button:hover {
+  background-color: #45a049;
+}
+
+.Sequipment-table .action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  height: 100%; /* Make the container take full height of the cell */
+  align-items: center; /* Vertically center the buttons */
+}
+
+.edit-btn, .delete-btn {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 3px;
+  transition: background-color 0.2s;
+}
+
+.edit-btn {
+  color: #2196f3;
+}
+
+.edit-btn:hover {
+  background-color: rgba(33, 150, 243, 0.1);
+}
+
+.delete-btn {
+  color: #f44336;
+}
+
+.delete-btn:hover {
+  background-color: rgba(244, 67, 54, 0.1);
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.equipment-modal {
+  background-color: white;
+  border-radius: 8px;
+  padding: 25px;
+  width: 500px;
+  max-width: 90%;
+}
+
+.equipment-modal h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+
+
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.cancel-btn,
+.save-btn {
+  padding: 8px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.cancel-btn {
+  background-color: #f5f5f5;
+  color: #333;
+}
+
+.cancel-btn:hover {
+  background-color: #e0e0e0;
+}
+
+.save-btn {
+  background-color: #2196f3;
+  color: white;
+}
+
+.save-btn:hover {
+  background-color: #0b7dda;
+}
+
+.loading {
+  text-align: center;
+  padding: 20px;
+  font-style: italic;
+  color: #666;
+}
+
+/* Ensure this works with your existing styles */
+.Sequipment-table-container {
+  margin-top: 20px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  max-height: 500px; /* Set a fixed height for scrolling */
+  overflow-y: auto; /* Enable vertical scrolling */
+  max-width: 100%;
+  width: 100%;
+}
+
+.actions-center {
+  text-align: right;
+  padding-right: 410px; /* Adjust this value as needed */
+}
+
+.Sequipment-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: auto; /* or fixed if you want consistent column widths */
+}
+
+.Sequipment-table th,
+.Sequipment-table td {
+  padding: 20px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+  vertical-align: middle; /* Add this to vertically center all content */
+}
+.Sequipment-table th.text-center {
+  text-align: center; /* Keep it centered horizontally */
+  vertical-align: middle; /* Add vertical centering */
+}
+.Sequipment-table th {
+  background-color: #f9f9f9;
+  font-weight: 600;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.Sequipment-row:hover {
+  background-color: #f5f5f5;
+}
+
+.Sequipment-table th.action-header {
+  text-align: right;
+  padding-right: 170px; /* Adjust this value as needed */
+}
+
+/* If you need to adjust the column widths */
+.Sequipment-table th:first-child,
+.Sequipment-table td:first-child {
+  width: 20%;
+}
+
+.Sequipment-table th:nth-child(2),
+.Sequipment-table td:nth-child(2) {
+  width: 20%;
+  text-align: center;
+}
+
+.Sequipment-table th:last-child,
+.Sequipment-table td:last-child {
+  width: 20%;
+}
+.no-results {
+  text-align: center;
+  padding: 20px;
+  font-style: italic;
+  color: #666;
+}

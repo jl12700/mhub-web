@@ -11,7 +11,7 @@ const Login = () => {
 
   const handleIdNumberChange = (e) => {
     const value = e.target.value;
-    if (/^\d*$/.test(value)) { 
+    if (/^\d*$/.test(value)) {
       setIdNumber(value);
     }
   };
@@ -25,19 +25,22 @@ const Login = () => {
 
     if (userType === 'admin') {
       if (email === adminCredentials.username && password === adminCredentials.password) {
-        navigate('/dashboard'); 
+        localStorage.setItem('user', JSON.stringify({ email, idNumber, userType }));
+        navigate('/admin/reservations'); // Redirect to admin reservations screen
       } else {
         alert('Invalid admin credentials');
       }
     } else if (userType === 'student') {
       if (email.endsWith('@dlsl.edu.ph') && password === studentPassword) {
-        navigate('/set-password'); 
+        localStorage.setItem('user', JSON.stringify({ email, idNumber, userType }));
+        navigate('/set-password'); // Redirect to set password screen
       } else {
         alert('Invalid student credentials. Make sure you are using your school email and correct password.');
       }
     } else if (userType === 'faculty') {
       if (email.endsWith('@dlsl.edu.ph') && password === facultyPassword) {
-        navigate('/set-password'); 
+        localStorage.setItem('user', JSON.stringify({ email, idNumber, userType }));
+        navigate('/set-password'); // Redirect to set password screen
       } else {
         alert('Invalid faculty credentials. Make sure you are using your school email and correct password.');
       }
@@ -46,38 +49,11 @@ const Login = () => {
 
   return (
     <div className="login-container">
-      <img src="/dlsl-logo.png" alt="DLSL Logo" className="logo" />
-      <h2>MHUB Reservation System</h2>
+      <img src="/dlsl-logo.png" alt="DLSL Logo" className="llogo" />
+      <h2>MHUB Reservation</h2>
       <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label>Email/Username:</label>
-          <input
-            type="text"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label>Student/Faculty ID Number:</label>
-          <input
-            type="text"
-            value={idNumber}
-            onChange={handleIdNumberChange} 
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label>Password:</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label>User Type:</label>
+        <div className="lform-group drop">
+          <label>Role:</label>
           <select
             value={userType}
             onChange={(e) => setUserType(e.target.value)}
@@ -87,6 +63,33 @@ const Login = () => {
             <option value="faculty">Faculty</option>
             <option value="admin">Admin</option>
           </select>
+        </div>
+        <div className="lform-group">
+          <label>Email:</label>
+          <input
+            type="text"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+        </div>
+        <div className="lform-group">
+          <label>ID Number:</label>
+          <input
+            type="text"
+            value={idNumber}
+            onChange={handleIdNumberChange}
+            required
+          />
+        </div>
+        <div className="lform-group">
+          <label>Password:</label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
         </div>
         <button type="submit">Login</button>
       </form>

@@ -1,70 +1,204 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Logout from './Logout';
 import '../styles/Dashboard.css';
 import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
   const [activeItem, setActiveItem] = useState('Dashboard');
-  const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [userType, setUserType] = useState('');
+  const [reservationHistory, setReservationHistory] = useState([]);
+  const [userReservations, setUserReservations] = useState([]);
+  const [outOfStockEquipment, setOutOfStockEquipment] = useState([]);
+  const [pendingApprovals, setPendingApprovals] = useState([]);
+  const [refreshKey, setRefreshKey] = useState(0);
 
-  const equipmentList = [
-    { id: 1, name: 'TV', stock: 5, image: '/tv.jpg' },
-    { id: 2, name: 'Laptop', stock: 10, image: '/laptop.jpg' },
-    { id: 3, name: 'Extension Cord', stock: 8, image: '/extension.jpg' },
-    { id: 4, name: 'Speakers', stock: 3, image: '/speaker.jpg' },
-    { id: 5, name: 'Microphone', stock: 7, image: '/mic.jpg' },
-    { id: 6, name: 'Projector', stock: 2, image: '/projector.jpg' },
-  ];
+  const refreshData = () => {
+    setRefreshKey(oldKey => oldKey + 1);
+  };
 
+  useEffect(() => {
+    const storedReservations = JSON.parse(localStorage.getItem('pendingReservations')) || [];
+    
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user) {
+      setUserType(user.userType);
+      
+      const userEmail = user.email || localStorage.getItem('userName');
+      
+      const pending = storedReservations.filter(
+        res => res.status === 'Pending' && res.userName === userEmail
+      );
+      
+      const active = storedReservations.filter(
+        res => res.status === 'Accepted' && res.userName === userEmail
+      );
+      
+      const history = storedReservations.filter(
+        res => (res.status === 'Returned' || res.status === 'Declined' || res.status === 'Damaged') 
+        && res.userName === userEmail
+      );
+      
+      setPendingApprovals(pending);
+      setUserReservations(active);
+      setReservationHistory(history);
+    }
+    
+    setOutOfStockEquipment(['Printer']);
+  }, [refreshKey]); 
 
-  const filteredEquipment = equipmentList.filter((equipment) =>
-    equipment.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  useEffect(() => {
+    const handleStorageChange = (event) => {
+      if (event.key === 'pendingReservations') {
+        refreshData();
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
+
+  const handleNavigation = (item) => {
+    setActiveItem(item);
+    switch (item) {
+      case 'Borrow Item':
+        navigate('/borrow');
+        break;
+      case 'User Profile':
+        navigate('/profile');
+        break;
+      case 'Logout':
+        setShowLogoutModal(true);
+        break;
+      case 'Reservations':
+        navigate('/admin/reservations');
+        break;
+      case 'Inventory':
+        navigate('/admin/inventory');
+        break;
+      case 'Statistics':
+        navigate('/admin/statistics');
+        break;
+      default:
+        break;
+    }
+  };
+
+  const adminSidebarItems = ['Reservations', 'Inventory', 'Statistics', 'Logout'];
+  const userSidebarItems = ['Dashboard', 'Borrow Item', 'User Profile', 'Logout'];
+
+  const formatReservationItem = (res) => {
+    const itemNames = res.items ? res.items.map(item => `${item.name} (${item.quantity})`).join(', ') : 'No items';
+    return `${itemNames} - Pickup: ${res.pickupDate}`;
+  };
 
   return (
     <div className="dashboard-container">
-      
       <div className="sidebar">
-        <img src="/dlsl-logo.png" alt="DLSL Logo" className="logo" />
-        <div className="sidebar-title">MHUB Reservation</div>
+        <img src="/mhublogo.png" alt="DLSL Logo" className="logo" />
         <ul>
-  <li className={activeItem === 'Dashboard' ? 'active' : ''} onClick={() => navigate('/dashboard')}>Dashboard</li>
-  <li className={activeItem === 'Borrow Item' ? 'active' : ''} onClick={() => navigate('/borrow')}>Borrow Item</li>
-  <li className={activeItem === 'User Profile' ? 'active' : ''} onClick={() => navigate('/profile')}>User Profile</li>
-  <li className={activeItem === 'Logout' ? 'active' : ''} onClick={() => navigate('/logout')}>Logout</li>
-</ul>
-
+          {(userType === 'admin' ? adminSidebarItems : userSidebarItems).map((item) => (
+            <li
+              key={item}
+              className={activeItem === item ? 'active' : ''}
+              onClick={() => handleNavigation(item)}
+            >
+              {item}
+              {activeItem === item && <span className="arrow">▶</span>}
+            </li>
+          ))}
+        </ul>
       </div>
 
       <div className="main-content">
-       
         <div className="header">
-          <h1>Welcome to MHUB Dashboard</h1>
-          <p>All equipment is ready for reservation.</p>
-          <input
-            type="text"
-            className="search-bar"
-            placeholder="Search equipment..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
+          <h1 className="no-underline">Dashboard Overview </h1>
+          
         </div>
 
-        
-        <div className="equipment-grid">
-          {filteredEquipment.length > 0 ? (
-            filteredEquipment.map((equipment) => (
-              <div key={equipment.id} className="equipment-card">
-                <img src={equipment.image} alt={equipment.name} className="equipment-image" />
-                <h3>{equipment.name}</h3>
-                <p>Stock: {equipment.stock}</p>
+        {userType !== 'admin' && (
+          <div className="tiles-container">
+            <div className="tile">
+              <div className="tile-header">Reservation History</div>
+              <div className="tile-content">
+                {reservationHistory.length > 0 ? (
+                  <ul>
+                    {reservationHistory.map((res, index) => (
+                      <li key={index}>
+                        {formatReservationItem(res)}
+                        <span className="status-badge" style={{ 
+                          backgroundColor: res.status === 'Returned' ? 'blue' : 
+                                           res.status === 'Declined' ? 'red' : 
+                                           res.status === 'Damaged' ? 'orange' : 'gray' 
+                        }}>
+                          {res.status}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  'No recent reservations.'
+                )}
               </div>
-            ))
-          ) : (
-            <p className="no-results">No equipment found.</p>
-          )}
-        </div>
+            </div>
+
+            <div className="tile">
+              <div className="tile-header">Active Reservations</div>
+              <div className="tile-content">
+                {userReservations.length > 0 ? (
+                  <ul>
+                    {userReservations.map((res, index) => (
+                      <li key={index}>
+                        {formatReservationItem(res)}
+                        <span className="status-badge" style={{ backgroundColor: 'green' }}>
+                          {res.status}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  'No active reservations.'
+                )}
+              </div>
+            </div>
+
+            <div className="tile">
+              <div className="tile-header">Out of Stock</div>
+              <div className="tile-content">
+                {outOfStockEquipment.length > 0
+                  ? outOfStockEquipment.join(', ')
+                  : 'All equipment is available.'}
+              </div>
+            </div>
+
+            <div className="tile">
+              <div className="tile-header">Pending Approvals</div>
+              <div className="tile-content">
+                {pendingApprovals.length > 0 ? (
+                  <ul>
+                    {pendingApprovals.map((res, index) => (
+                      <li key={index}>
+                        {formatReservationItem(res)}
+                        <span className="status-badge" style={{ backgroundColor: 'gray' }}>
+                          {res.status}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  'No pending approvals.'
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
+
+      {showLogoutModal && <Logout setShowModal={setShowLogoutModal} />}
     </div>
   );
 };

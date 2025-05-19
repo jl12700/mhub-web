@@ -22,26 +22,36 @@ body {
    
 }
 
-.logo {
-    width: 200px;  
-    height: 250px;
+.llogo {
+    width: 170px;  
+    height: 200px;
     margin-top: 1px;
     margin-bottom: 1px;
 }
 
 
-
-h2 {
+.login-container h2 {
     color: #4CAF50; 
     margin-bottom: 15px;
-    font-size: 20px;
+    font-size: 25px;
     margin-top: 1px;
 }
 
-.form-group {
+.lform-group {
     margin-bottom: 12px;
     text-align: left;
     margin-right: 15px;
+    
+}
+
+.lform-group.drop {
+    margin-bottom: 12px;
+    text-align: left;
+    margin-left: 0;  
+}
+.lform-group.drop select {
+    height: 30px;
+   
 }
 
 label {
@@ -52,11 +62,12 @@ label {
 }
 
 input, select {
-    width: 100%;
-    padding: 6px; 
+    width: 105%;
+    padding: 5px; 
     font-size: 14px;
     border: 1px solid #ccc;
-    border-radius: 5px;
+    border-radius: 5px; 
+    
 }
 
 button {

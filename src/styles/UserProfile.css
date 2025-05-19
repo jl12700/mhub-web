@@ -1,0 +1,106 @@
+/* User Profile Container */
+.profile-details {
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 900px; /* Increased max-width for wider layout */
+    margin: 20px auto;
+  }
+  
+  .profile-details h1 {
+    text-align: center;
+    color: #4CAF50; /* Green color for the header */
+    margin-bottom: 20px;
+  }
+  
+  /* Grid layout for fields */
+  .profile-fields-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Two columns */
+    gap: 20px; /* Space between fields */
+  }
+  
+  .profile-field {
+    margin-bottom: 20px; /* Adjusted margin for better spacing */
+  }
+  
+  .profile-field label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px; /* Adjusted margin for better spacing */
+    color: #333;
+    font-size: 1rem; /* Adjusted font size */
+  }
+  
+  /* Ensure all fields have the same size */
+  .profile-field input,
+  .profile-field span {
+    width: 100%;
+    padding: 20px; /* Consistent padding for all fields */
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem; /* Consistent font size */
+    height: 45px; /* Fixed height for all fields */
+    box-sizing: border-box; /* Ensure padding is included in height */
+    display: flex;
+    align-items: center; /* Center text vertically */
+  }
+  
+  .profile-field input:focus {
+    border-color: #4CAF50; /* Green border on focus */
+    outline: none;
+  }
+  
+  .profile-field span {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    color: #555;
+  }
+  
+  /* Profile Actions */
+  .profile-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 30px;
+  }
+  
+  .profile-actions button {
+    padding: 10px 20px; /* Adjusted button padding */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem; /* Adjusted font size */
+    transition: background-color 0.3s, transform 0.2s;
+  }
+  
+  .edit-button {
+    background-color: #4CAF50; /* Green color for edit */
+    color: white;
+  }
+  
+  .edit-button:hover {
+    background-color: #45a049; /* Darker green on hover */
+    transform: scale(1.05);
+  }
+  
+  .save-button {
+    background-color: #2196F3; /* Blue color for save */
+    color: white;
+  }
+  
+  .save-button:hover {
+    background-color: #1976D2; /* Darker blue on hover */
+    transform: scale(1.05);
+  }
+  
+  .cancel-button {
+    background-color: #f44336; /* Red color for cancel */
+    color: white;
+  }
+  
+  .cancel-button:hover {
+    background-color: #d32f2f; /* Darker red on hover */
+    transform: scale(1.05);
+  }
